@@ -1,0 +1,37 @@
+name: Lumina CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-contracts:
+    name: Test Soroban Smart Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Run Soroban Rust Contract Tests
+        run: cargo test --all
+
+  test-frontend:
+    name: Test Next.js Frontend & Integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run TypeScript Typecheck
+        run: npm run typecheck
+      - name: Run Vitest Suite
+        run: npm run test
