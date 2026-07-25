@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTxStore, TransactionItem } from "@/store/txStore";
 import { formatAddress } from "@/services/stellar";
-import { Wallet, ExternalLink, Copy, Check, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Wallet, Copy, Check, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 export default function TransactionsPage() {
   const { transactions } = useTxStore();
@@ -53,10 +53,10 @@ export default function TransactionsPage() {
         <div>
           <div className="flex items-center space-x-2">
             <Wallet className="w-5 h-5 text-blue-600" />
-            <h1 className="text-xl font-extrabold text-slate-900">Transaction History</h1>
+            <h1 className="text-xl font-extrabold text-slate-900">Transaction Ledger</h1>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            On-chain Stellar transaction log & contract calls
+            Real-time Soroban smart contract interaction & bounty audit log
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export default function TransactionsPage() {
       <div className="space-y-2.5">
         {filteredTxs.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-500 text-xs">
-            No transactions found.
+            No transactions recorded.
           </div>
         ) : (
           filteredTxs.map((tx) => (
@@ -99,35 +99,25 @@ export default function TransactionsPage() {
                   <span>•</span>
                   <span>{tx.timestamp}</span>
                 </div>
-
-                {tx.txHash && (
-                  <div className="flex items-center space-x-1.5 text-xs font-mono text-slate-700 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
-                    <span className="truncate max-w-xs">{tx.txHash}</span>
-                    <button
-                      onClick={() => handleCopy(tx.txHash)}
-                      className="p-0.5 text-slate-400 hover:text-slate-700 transition-colors"
-                      title="Copy Tx Hash"
-                    >
-                      {copiedHash === tx.txHash ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                )}
               </div>
 
               {tx.txHash && (
-                <a
-                  href={tx.explorerLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-mono text-blue-600 hover:underline border border-slate-200 transition-all"
-                >
-                  <span>Stellar Expert</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center space-x-2 flex-shrink-0 font-mono text-xs">
+                  <span className="text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                    Hash: {formatAddress(tx.txHash, 6)}
+                  </span>
+                  <button
+                    onClick={() => handleCopy(tx.txHash!)}
+                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-all"
+                    title="Copy Transaction Hash"
+                  >
+                    {copiedHash === tx.txHash ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
               )}
             </div>
           ))

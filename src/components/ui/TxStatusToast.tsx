@@ -2,7 +2,7 @@
 
 import { useTxStore, TransactionItem } from "@/store/txStore";
 import { formatAddress } from "@/services/stellar";
-import { ExternalLink, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 export function TxStatusToast() {
   const { transactions } = useTxStore();
@@ -27,23 +27,17 @@ export function TxStatusToast() {
     <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white border border-slate-200 rounded-xl p-3.5 shadow-xl backdrop-blur-md">
       <div className="flex items-start space-x-2.5">
         <div className="mt-0.5">{getStatusIcon(latestTx.status)}</div>
-        <div>
+        <div className="space-y-0.5">
           <h4 className="text-xs font-bold text-slate-900 uppercase">
             {latestTx.operationName}
           </h4>
-          <p className="text-xs text-slate-500 font-mono mt-0.5">
+          <p className="text-xs text-slate-500 font-mono">
             Status: <span className="font-semibold text-slate-800">{latestTx.status}</span> • {latestTx.timestamp}
           </p>
           {latestTx.txHash && (
-            <a
-              href={latestTx.explorerLink}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center space-x-1 text-[11px] font-mono text-blue-600 hover:underline mt-1"
-            >
-              <span>Hash: {formatAddress(latestTx.txHash, 5)}</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            <p className="text-[11px] font-mono text-slate-600">
+              Tx Hash: <span className="font-semibold text-slate-800">{formatAddress(latestTx.txHash, 5)}</span>
+            </p>
           )}
         </div>
       </div>
