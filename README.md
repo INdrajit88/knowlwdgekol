@@ -1,4 +1,4 @@
-# Lumina — Stellar Soroban Peer-to-Peer Experience Sharing Platform 🌟
+# knowledgekol — Stellar Soroban Peer-to-Peer Experience Sharing Platform 🌟
 
 [![Stellar Soroban](https://img.shields.io/badge/Stellar-Soroban_Level_3-blue.svg)](https://developers.stellar.org)
 [![Build Status](https://img.shields.io/badge/CI%2FCD-Passing-emerald.svg)](https://github.com)
@@ -6,7 +6,7 @@
 [![Vitest Suite](https://img.shields.io/badge/Vitest-8%2F8_Passed-success.svg)](https://vitest.dev)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black.svg)](https://nextjs.org)
 
-**Lumina** is a production-grade, decentralized **Peer-to-Peer Experience & Technical Knowledge Sharing Marketplace** built on the **Stellar Soroban** smart contract engine.
+**knowledgekol** is a production-grade, decentralized **Peer-to-Peer Experience & Technical Knowledge Sharing Marketplace** built on the **Stellar Soroban** smart contract engine.
 
 Askers post real-world technical questions backed by **XLM bounty escrows**. Experienced domain contributors write **Public Teaser Previews** alongside **Locked In-Depth Solution Articles**. When the asker selects a contributor's answer, Soroban smart contracts execute cross-contract calls to release the escrowed XLM bounty, award contributor reputation points, and unlock the full solution article for the asker.
 
@@ -123,8 +123,8 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 ### Step 1: Clone Repository & Install Dependencies
 
 ```bash
-git clone https://github.com/user/lumina-stellar-marketplace.git
-cd lumina-stellar-marketplace
+git clone https://github.com/INdrajit88/knowlwdgekol.git
+cd knowlwdgekol
 npm install
 ```
 

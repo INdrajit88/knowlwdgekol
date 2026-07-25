@@ -1,14 +1,24 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { TxStatusToast } from "@/components/ui/TxStatusToast";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
 export const metadata: Metadata = {
-  title: "Lumina | AI Knowledge Marketplace on Stellar Soroban",
+  title: "knowledgekol | Peer-to-Peer Experience Sharing Platform on Stellar Soroban",
   description:
-    "Perplexity + Web3: Decentralized Retrieval-Augmented Generation (RAG) AI marketplace with Soroban smart contracts, inter-contract escrow, and reputation rewards.",
-  keywords: ["Stellar", "Soroban", "RAG AI", "Smart Contracts", "Web3", "Knowledge Marketplace"],
+    "Decentralized peer-to-peer technical knowledge and experience sharing marketplace powered by Stellar Soroban smart contracts, gated answer teasers, and escrow bounty unlocks.",
 };
 
 export default function RootLayout({
@@ -17,10 +27,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className="bg-background text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-stellar-primary selection:text-white">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="bg-white text-slate-900 font-sans antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900">
         <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
           {children}
         </main>
         <Footer />

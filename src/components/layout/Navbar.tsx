@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWalletStore } from "@/store/walletStore";
 import { formatAddress } from "@/services/stellar";
-import { Sparkles, Wallet, LogOut, Activity, BarChart3, Settings, HelpCircle, Menu, X, Coins } from "lucide-react";
+import { BrainCircuit, Wallet, LogOut, Activity, BarChart3, Settings, HelpCircle, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
@@ -24,19 +24,14 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        {/* Left: Brand Logo */}
+        {/* Left: Brand Logo & Name */}
         <Link href="/" className="flex items-center space-x-2.5 flex-shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+            <BrainCircuit className="w-5 h-5 text-white" />
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-extrabold text-xl tracking-tight text-slate-900">
-              Lumina
-            </span>
-            <span className="hidden md:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
-              Stellar AI
-            </span>
-          </div>
+          <span className="font-extrabold text-xl tracking-tight text-slate-900">
+            knowledgekol
+          </span>
         </Link>
 
         {/* Center: Desktop Navigation Segment */}
