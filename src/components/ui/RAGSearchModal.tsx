@@ -46,11 +46,12 @@ export function RAGSearchModal({ isOpen, onClose }: RAGSearchModalProps) {
     try {
       updateTxStatus(txId, "Processing");
 
-      // Invoke real Stellar Testnet Soroban transaction
+      // Pass bountyXlm to trigger real Operation.payment deduction on Stellar Testnet via Freighter
       const realTxHash = await invokeSorobanTestnetTransaction(
         currentNetwork.marketContractId,
         "ask_question",
-        publicKey
+        publicKey,
+        bountyXlm
       );
 
       const qId = await askQuestion(prompt, category, bountyXlm, publicKey);
