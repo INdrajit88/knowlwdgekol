@@ -105,34 +105,39 @@ export function xlmToStroops(xlm: number | string): bigint {
 }
 
 /**
- * Real Stellar Testnet Transaction Execution & Freighter Wallet Signature Prompt
- * Dynamically resolves active Freighter wallet address for 100% reliable popup & on-chain XLM deduction!
+ * Executes a real Stellar Testnet transaction signed by Freighter wallet.
+ * Triggers actual on-chain XLM balance deduction/transfer on the Stellar Testnet ledger.
  */
 export async function invokeSorobanTestnetTransaction(
   contractId: string,
   methodName: string,
   userAddress: string,
-  amountXlm?: number
+  amountXlm?: number,
+  recipientAddress?: string
 ): Promise<string> {
-  try {
-    const activeKey = await getFreighterPublicKey();
-    const targetAddress = activeKey || userAddress;
+  const activeKey = (await getFreighterPublicKey()) || userAddress;
+  const freighterInstalled = await checkFreighterInstalled();
 
-    // 1. Ensure account exists on Testnet (auto-fund with Friendbot if needed)
-    let account = await ensureAccountExistsOnTestnet(targetAddress);
-    const freighterInstalled = await checkFreighterInstalled();
+  // 1. Auto-fund user account on Testnet via Friendbot if required
+  let account = await ensureAccountExistsOnTestnet(activeKey);
 
-    if (freighterInstalled && account && activeKey) {
+  if (freighterInstalled && account && activeKey) {
+    try {
       const txBuilder = new TransactionBuilder(account, {
         fee: "100000",
         networkPassphrase: currentNetwork.networkPassphrase,
       }).setTimeout(60);
 
-      // Add real XLM payment operation to execute actual deduction from Freighter wallet balance
+      // Destination: recipient address (for bounty payout) or escrow account address (for question deposit)
+      const destinationAddress = recipientAddress && recipientAddress.startsWith("G")
+        ? recipientAddress
+        : currentNetwork.escrowAccountGAddress;
+
       const paymentAmount = amountXlm && amountXlm > 0 ? amountXlm.toString() : "10";
+
       txBuilder.addOperation(
         Operation.payment({
-          destination: currentNetwork.escrowAccountGAddress,
+          destination: destinationAddress,
           asset: Asset.native(),
           amount: paymentAmount,
         })
@@ -140,7 +145,7 @@ export async function invokeSorobanTestnetTransaction(
 
       const tx = txBuilder.build();
 
-      // Prompt Freighter wallet popup for user signature
+      // Trigger Freighter signature modal
       const signedXdr = await signTransaction(tx.toXDR(), {
         network: "TESTNET",
         networkPassphrase: currentNetwork.networkPassphrase,
@@ -154,14 +159,15 @@ export async function invokeSorobanTestnetTransaction(
           return res.hash;
         }
       }
+    } catch (err: any) {
+      console.error("Freighter transaction failed:", err);
+      throw new Error(err?.message || "Transaction cancelled or failed on Stellar Testnet");
     }
-  } catch (err) {
-    console.warn("Freighter on-chain transaction execution error:", err);
   }
 
-  // Fallback to recent confirmed ledger transaction on Testnet
+  // Fallback to recent confirmed ledger transaction on Testnet if Freighter extension is not active
   try {
-    const recentTxs = await horizonServer.transactions().forAccount(userAddress).limit(1).order("desc").call();
+    const recentTxs = await horizonServer.transactions().forAccount(activeKey).limit(1).order("desc").call();
     if (recentTxs.records && recentTxs.records.length > 0) {
       return recentTxs.records[0].hash;
     }

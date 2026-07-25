@@ -66,6 +66,9 @@ export default function DashboardPage() {
       return;
     }
 
+    const targetAnswer = questionAnswers.find((a) => a.id === answerId);
+    const recipientAddress = targetAnswer ? targetAnswer.author : undefined;
+
     const txId = addTransaction({
       txHash: "",
       operationName: "accept_answer (Unlock Article & Escrow Payout)",
@@ -77,12 +80,13 @@ export default function DashboardPage() {
     try {
       updateTxStatus(txId, "Processing");
 
-      // Real Soroban Testnet Transaction invocation
+      // Real Soroban Testnet Transaction invocation transferring XLM to answer author
       const realTxHash = await invokeSorobanTestnetTransaction(
         currentNetwork.treasuryContractId,
         "accept_answer",
         publicKey,
-        selectedQuestion.bountyXlm
+        selectedQuestion.bountyXlm,
+        recipientAddress
       );
 
       await acceptAnswer(selectedQuestion.id, answerId, publicKey);
