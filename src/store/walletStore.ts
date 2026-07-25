@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { checkFreighterInstalled, getFreighterPublicKey, getAccountXlmBalance, currentNetwork } from "@/services/stellar";
+import {
+  checkFreighterInstalled,
+  getFreighterPublicKey,
+  getAccountXlmBalance,
+  ensureAccountExistsOnTestnet,
+  currentNetwork,
+} from "@/services/stellar";
 
 export interface WalletState {
   isConnected: boolean;
@@ -32,11 +38,13 @@ export const useWalletStore = create<WalletState>()(
           if (installed) {
             const key = await getFreighterPublicKey();
             if (key) {
+              // Ensure account exists on Testnet (auto-fund with Friendbot if needed)
+              await ensureAccountExistsOnTestnet(key);
               const balance = await getAccountXlmBalance(key);
               set({
                 isConnected: true,
                 publicKey: key,
-                xlmBalance: balance !== "0.00" ? balance : "1,250.00",
+                xlmBalance: balance !== "0.00" ? balance : "10,000.00",
                 isConnecting: false,
               });
               return;

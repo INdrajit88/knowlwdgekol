@@ -81,7 +81,8 @@ export default function DashboardPage() {
       const realTxHash = await invokeSorobanTestnetTransaction(
         currentNetwork.treasuryContractId,
         "accept_answer",
-        publicKey
+        publicKey,
+        selectedQuestion.bountyXlm
       );
 
       await acceptAnswer(selectedQuestion.id, answerId, publicKey);
