@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { eventStreamService, ContractEvent } from "@/services/eventStream";
 import { currentNetwork } from "@/services/stellar";
+import { useWalletStore } from "@/store/walletStore";
 
 export interface QuestionModel {
   id: number;
@@ -56,7 +57,7 @@ export interface KnowledgeState {
   syncWithServer: () => Promise<void>;
 }
 
-const STORAGE_KEY = "lumina_knowledge_store_v2";
+const STORAGE_KEY = "knowledgekol_store_v3";
 
 const initialDefaultQuestions: QuestionModel[] = [
   {
@@ -122,15 +123,7 @@ env.storage().persistent().extend_ttl(&key, 500, 10_000);
       isAccepted: false,
       ipfsCid: "bafybeic5a76xvwz89y67u5k4a3m2n1o0p9q8r7s6t5u4v3w2x1y0z",
       createdAt: "10 mins ago",
-      citations: [
-        {
-          id: 1,
-          title: "Soroban State Archival Guide",
-          url: "https://developers.stellar.org/docs/build/guides/archival",
-          sourceDomain: "developers.stellar.org",
-          snippet: "Understanding storage TTL, persistent keys, and state restoration on Stellar.",
-        },
-      ],
+      citations: [],
     },
   ],
   2: [
@@ -154,15 +147,7 @@ When building inter-contract communication between our Marketplace and Treasury 
       isAccepted: true,
       ipfsCid: "bafybeigk987x6v5c4b3n2m1l0k9j8h7g6f5d4s3a2p1o0i9u8y7t6r5e4w",
       createdAt: "45 mins ago",
-      citations: [
-        {
-          id: 1,
-          title: "Soroban Inter-Contract Authorization",
-          url: "https://developers.stellar.org/docs/build/guides/auth",
-          sourceDomain: "developers.stellar.org",
-          snippet: "Authentication propagation and permission verification in cross-contract calls.",
-        },
-      ],
+      citations: [],
     },
   ],
 };
@@ -213,13 +198,15 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
           saveState(qData.questions, aData.answers, get().leaderboard);
         }
       }
-    } catch (err) {
-      console.error("Error syncing with server", err);
-    }
+    } catch (err) {}
   },
 
   askQuestion: async (prompt, category, bountyXlm, asker) => {
     let id = Date.now();
+
+    // Deduct bounty XLM from asking user's balance
+    useWalletStore.getState().deductBalance(bountyXlm);
+
     try {
       const res = await fetch("/api/questions", {
         method: "POST",
@@ -233,7 +220,6 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
         saveState(data.questions, get().answers, get().leaderboard);
       }
     } catch (e) {
-      // Local fallback
       const newQuestion: QuestionModel = {
         id,
         asker,
@@ -251,7 +237,6 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
       });
     }
 
-    // Broadcast event across tabs
     eventStreamService.emitEvent({
       id: `evt-${id}`,
       contractId: currentNetwork.marketContractId,
@@ -297,7 +282,6 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
         });
       }
     } catch (e) {
-      // Local fallback
       const newAnswer: AnswerModel = {
         id,
         questionId,
@@ -352,6 +336,9 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
   },
 
   acceptAnswer: async (questionId, answerId, asker) => {
+    const question = get().questions.find((q) => q.id === questionId);
+    const bountyXlm = question ? question.bountyXlm : 50;
+
     try {
       await fetch("/api/answers", {
         method: "POST",
@@ -362,13 +349,40 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
 
     set((state) => {
       const list = state.answers[questionId] || [];
+      const targetAnswer = list.find((a) => a.id === answerId);
+      const authorAddress = targetAnswer ? targetAnswer.author : "";
+
+      // Credit bounty XLM to answer author's balance
+      if (authorAddress === useWalletStore.getState().publicKey) {
+        useWalletStore.getState().creditBalance(bountyXlm);
+      }
+
+      // Update Leaderboard earnings
+      const updatedLeaderboard = state.leaderboard.map((item) => {
+        if (item.address === authorAddress) {
+          return {
+            ...item,
+            reputationPoints: item.reputationPoints + 50,
+            totalEarnedXlm: item.totalEarnedXlm + bountyXlm,
+            acceptedCount: item.acceptedCount + 1,
+          };
+        }
+        return item;
+      });
+
       const updatedList = list.map((a) => (a.id === answerId ? { ...a, isAccepted: true, isUnlocked: true } : a));
       const updatedAnswers = { ...state.answers, [questionId]: updatedList };
       const updatedQuestions = state.questions.map((q) =>
         q.id === questionId ? { ...q, status: "Resolved" as const, selectedAnswerId: answerId } : q
       );
-      saveState(updatedQuestions, updatedAnswers, state.leaderboard);
-      return { answers: updatedAnswers, questions: updatedQuestions };
+
+      saveState(updatedQuestions, updatedAnswers, updatedLeaderboard);
+
+      return {
+        answers: updatedAnswers,
+        questions: updatedQuestions,
+        leaderboard: updatedLeaderboard,
+      };
     });
 
     eventStreamService.emitEvent({
@@ -450,7 +464,6 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
   },
 }));
 
-// Subscribe knowledge store directly to eventStreamService for multi-tab auto-sync
 if (typeof window !== "undefined") {
   eventStreamService.subscribe((evt) => {
     useKnowledgeStore.getState().applyExternalEvent(evt);
