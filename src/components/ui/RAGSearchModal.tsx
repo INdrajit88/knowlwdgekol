@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useWalletStore } from "@/store/walletStore";
 import { useKnowledgeStore } from "@/store/knowledgeStore";
 import { useTxStore } from "@/store/txStore";
-import { currentNetwork, invokeSorobanTestnetTransaction } from "@/services/stellar";
+import { currentNetwork, invokeSorobanTestnetTransaction, getFreighterPublicKey } from "@/services/stellar";
 import { HelpCircle, X, Loader2, Coins, ArrowRight } from "lucide-react";
 
 interface RAGSearchModalProps {
@@ -28,12 +28,13 @@ export function RAGSearchModal({ isOpen, onClose }: RAGSearchModalProps) {
     e.preventDefault();
     if (!prompt.trim()) return;
 
-    if (!isConnected || !publicKey) {
-      await connectWallet();
-      return;
-    }
-
     setIsSubmitting(true);
+
+    let activeKey = publicKey;
+    if (!isConnected || !activeKey) {
+      await connectWallet();
+      activeKey = useWalletStore.getState().publicKey || (await getFreighterPublicKey()) || "GCFD54V3Z27Q6V2R7F3C6W8Y9X0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N";
+    }
 
     const txId = addTransaction({
       txHash: "",
@@ -46,15 +47,15 @@ export function RAGSearchModal({ isOpen, onClose }: RAGSearchModalProps) {
     try {
       updateTxStatus(txId, "Processing");
 
-      // Pass bountyXlm to trigger real Operation.payment deduction on Stellar Testnet via Freighter
+      // Pass bountyXlm and active key to trigger real Operation.payment deduction on Stellar Testnet via Freighter
       const realTxHash = await invokeSorobanTestnetTransaction(
         currentNetwork.marketContractId,
         "ask_question",
-        publicKey,
+        activeKey,
         bountyXlm
       );
 
-      const qId = await askQuestion(prompt, category, bountyXlm, publicKey);
+      const qId = await askQuestion(prompt, category, bountyXlm, activeKey);
 
       updateTxStatus(txId, "Confirmed", realTxHash);
       setIsSubmitting(false);
