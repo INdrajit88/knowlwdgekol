@@ -1,4 +1,4 @@
-import { isConnected, getPublicKey, signTransaction } from "@stellar/freighter-api";
+import * as FreighterApiModule from "@stellar/freighter-api";
 import { Horizon, TransactionBuilder, Networks, Operation, Asset, StrKey, Account } from "@stellar/stellar-sdk";
 
 export interface NetworkConfig {
@@ -32,6 +32,28 @@ export const NETWORKS = {
 
 const horizonServer = new Horizon.Server(currentNetwork.horizonUrl);
 
+// Safe dynamic accessor for @stellar/freighter-api methods compatible with both ESM/CJS & Vitest mocks
+const freighterIsConnected = () => {
+  const mod = FreighterApiModule as any;
+  if (typeof mod.isConnected === "function") return mod.isConnected();
+  if (mod.default && typeof mod.default.isConnected === "function") return mod.default.isConnected();
+  return Promise.resolve(false);
+};
+
+const freighterGetPublicKey = () => {
+  const mod = FreighterApiModule as any;
+  if (typeof mod.getPublicKey === "function") return mod.getPublicKey();
+  if (mod.default && typeof mod.default.getPublicKey === "function") return mod.default.getPublicKey();
+  return Promise.resolve(null);
+};
+
+const freighterSignTransaction = (txXdr: string, opts?: any) => {
+  const mod = FreighterApiModule as any;
+  if (typeof mod.signTransaction === "function") return mod.signTransaction(txXdr, opts);
+  if (mod.default && typeof mod.default.signTransaction === "function") return mod.default.signTransaction(txXdr, opts);
+  return Promise.resolve("");
+};
+
 export function isValidStellarAddress(address: string | undefined): boolean {
   if (!address) return false;
   try {
@@ -44,7 +66,7 @@ export function isValidStellarAddress(address: string | undefined): boolean {
 export async function checkFreighterInstalled(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   try {
-    const connected = await isConnected();
+    const connected = await freighterIsConnected();
     return !!connected;
   } catch (err) {
     return false;
@@ -53,7 +75,7 @@ export async function checkFreighterInstalled(): Promise<boolean> {
 
 export async function getFreighterPublicKey(): Promise<string | null> {
   try {
-    const key = await getPublicKey();
+    const key = await freighterGetPublicKey();
     return key && isValidStellarAddress(key) ? key : null;
   } catch (err) {
     return null;
@@ -164,7 +186,7 @@ export async function invokeSorobanTestnetTransaction(
       const tx = txBuilder.build();
 
       // Trigger Freighter signature modal
-      const signedXdr = await signTransaction(tx.toXDR(), {
+      const signedXdr = await freighterSignTransaction(tx.toXDR(), {
         network: "TESTNET",
         networkPassphrase: currentNetwork.networkPassphrase,
       });
