@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  checkFreighterInstalled,
-  getFreighterPublicKey,
-  getAccountXlmBalance,
-  ensureAccountExistsOnTestnet,
-  currentNetwork,
-} from "@/services/stellar";
+import * as stellarService from "@/services/stellar";
 
 export interface WalletState {
   isConnected: boolean;
@@ -14,12 +8,14 @@ export interface WalletState {
   xlmBalance: string;
   isConnecting: boolean;
   network: string;
-  connectWallet: () => Promise<void>;
+  error: string | null;
+  connectWallet: () => Promise<boolean>;
   disconnectWallet: () => void;
   setNetwork: (networkName: string) => void;
   refreshBalance: () => Promise<void>;
   deductBalance: (amountXlm: number) => void;
   creditBalance: (amountXlm: number) => void;
+  clearError: () => void;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -27,39 +23,58 @@ export const useWalletStore = create<WalletState>()(
     (set, get) => ({
       isConnected: false,
       publicKey: null,
-      xlmBalance: "1,250.00",
+      xlmBalance: "0.00",
       isConnecting: false,
       network: "TESTNET",
+      error: null,
 
-      connectWallet: async () => {
-        set({ isConnecting: true });
+      connectWallet: async (): Promise<boolean> => {
+        set({ isConnecting: true, error: null });
         try {
-          const installed = await checkFreighterInstalled();
-          if (installed) {
-            const key = await getFreighterPublicKey();
-            if (key) {
-              // Ensure account exists on Testnet (auto-fund with Friendbot if needed)
-              await ensureAccountExistsOnTestnet(key);
-              const balance = await getAccountXlmBalance(key);
-              set({
-                isConnected: true,
-                publicKey: key,
-                xlmBalance: balance !== "0.00" ? balance : "10,000.00",
-                isConnecting: false,
-              });
-              return;
-            }
+          const installed = await stellarService.checkFreighterInstalled();
+          if (!installed) {
+            set({
+              isConnected: false,
+              publicKey: null,
+              xlmBalance: "0.00",
+              isConnecting: false,
+              error: "Freighter wallet extension is not installed. Please install Freighter from https://www.freighter.app",
+            });
+            return false;
           }
-        } catch (err) {}
 
-        // Demo fallback wallet connection
-        const mockPublicKey = "GCFD54V3Z27Q6V2R7F3C6W8Y9X0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N";
-        set({
-          isConnected: true,
-          publicKey: mockPublicKey,
-          xlmBalance: "1,250.00",
-          isConnecting: false,
-        });
+          const key = await stellarService.getFreighterPublicKey();
+          if (key) {
+            await stellarService.ensureAccountExistsOnTestnet(key);
+            const balance = await stellarService.getAccountXlmBalance(key);
+            set({
+              isConnected: true,
+              publicKey: key,
+              xlmBalance: balance !== "0.00" ? balance : "10,000.00",
+              isConnecting: false,
+              error: null,
+            });
+            return true;
+          } else {
+            set({
+              isConnected: false,
+              publicKey: null,
+              xlmBalance: "0.00",
+              isConnecting: false,
+              error: "Access denied. Please unlock Freighter and allow connection.",
+            });
+            return false;
+          }
+        } catch (err: any) {
+          set({
+            isConnected: false,
+            publicKey: null,
+            xlmBalance: "0.00",
+            isConnecting: false,
+            error: err?.message || "Failed to connect Freighter wallet.",
+          });
+          return false;
+        }
       },
 
       disconnectWallet: () => {
@@ -67,6 +82,7 @@ export const useWalletStore = create<WalletState>()(
           isConnected: false,
           publicKey: null,
           xlmBalance: "0.00",
+          error: null,
         });
       },
 
@@ -74,10 +90,14 @@ export const useWalletStore = create<WalletState>()(
         set({ network: networkName });
       },
 
+      clearError: () => {
+        set({ error: null });
+      },
+
       refreshBalance: async () => {
         const { publicKey } = get();
         if (publicKey) {
-          const balance = await getAccountXlmBalance(publicKey);
+          const balance = await stellarService.getAccountXlmBalance(publicKey);
           if (balance !== "0.00") {
             set({ xlmBalance: balance });
           }
@@ -86,7 +106,7 @@ export const useWalletStore = create<WalletState>()(
 
       deductBalance: (amountXlm: number) => {
         const currentStr = get().xlmBalance.replace(/,/g, "");
-        const currentNum = parseFloat(currentStr) || 1250;
+        const currentNum = parseFloat(currentStr) || 0;
         const newNum = Math.max(0, currentNum - amountXlm);
         set({
           xlmBalance: newNum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -95,7 +115,7 @@ export const useWalletStore = create<WalletState>()(
 
       creditBalance: (amountXlm: number) => {
         const currentStr = get().xlmBalance.replace(/,/g, "");
-        const currentNum = parseFloat(currentStr) || 1250;
+        const currentNum = parseFloat(currentStr) || 0;
         const newNum = currentNum + amountXlm;
         set({
           xlmBalance: newNum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWalletStore } from "@/store/walletStore";
 import { formatAddress } from "@/services/stellar";
-import { BrainCircuit, Wallet, LogOut, Activity, BarChart3, Settings, HelpCircle, Menu, X } from "lucide-react";
+import { BrainCircuit, Wallet, LogOut, Activity, BarChart3, Settings, HelpCircle, Menu, X, ExternalLink, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { isConnected, publicKey, xlmBalance, isConnecting, connectWallet, disconnectWallet, network } =
+  const { isConnected, publicKey, xlmBalance, isConnecting, connectWallet, disconnectWallet, network, error, clearError } =
     useWalletStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -23,6 +23,33 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+      {/* Wallet Connection Error / Installation Guidance Banner */}
+      {error && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-800 flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span className="font-medium">{error}</span>
+          </div>
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <a
+              href="https://www.freighter.app"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] transition-all"
+            >
+              <span>Get Freighter</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <button
+              onClick={clearError}
+              className="p-1 hover:bg-amber-100 rounded-md text-amber-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         {/* Left: Brand Logo & Name */}
         <Link href="/" className="flex items-center space-x-2.5 flex-shrink-0">
@@ -77,12 +104,12 @@ export function Navbar() {
             </div>
           ) : (
             <button
-              onClick={connectWallet}
+              onClick={() => connectWallet()}
               disabled={isConnecting}
               className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition-all disabled:opacity-50"
             >
               <Wallet className="w-3.5 h-3.5" />
-              <span>{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
+              <span>{isConnecting ? "Connecting..." : "Connect Freighter"}</span>
             </button>
           )}
 
