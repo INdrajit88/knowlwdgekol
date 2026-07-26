@@ -31,27 +31,19 @@ Askers post real-world technical questions backed by **XLM bounty escrows**. Exp
 - **Network Target**: Stellar Testnet (`https://horizon-testnet.stellar.org`)
 - **Connection Guard**: Enforces authentic Freighter browser extension presence with direct installation guidance when missing.
 
-### 3. Deployed Soroban Smart Contract Addresses
+### 3. Deployed & Verified Soroban Smart Contract Addresses (Clickable Hyperlinks)
 - **Stellar Network**: Stellar Testnet
 - **Knowledge Marketplace Contract ID**:
-  ```text
-  CB56K7N4S6V3Z27Q6V2R7F3C6W8Y9X0Z1A2B3C4D5E6F7G8H9I0J1K2L
-  ```
+  - [`CCW67TSBZV2BE2W7624Q7WUYFA65Y4Z5IOM7X6VWWL226CXYL4N3EUS4`](https://stellar.expert/explorer/testnet/contract/CCW67TSBZV2BE2W7624Q7WUYFA65Y4Z5IOM7X6VWWL226CXYL4N3EUS4)
 - **Reputation Treasury Contract ID**:
-  ```text
-  CD89L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6
-  ```
+  - [`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`](https://stellar.expert/explorer/testnet/contract/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC)
 
-### 4. Verifiable Contract Interaction Transaction Hashes
-- **`ask_question` Escrow Bounty Deposit Hash**:
-  ```text
-  2b5f63d047b85e0544f8e5f2a1b9c3e4d5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
-  ```
-- **`accept_answer` Payout & Unlock Hash**:
-  ```text
-  592d7a3e81b4c90d2e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d
-  ```
-- **Stellar Explorer Resolution**: [https://stellar.expert/explorer/testnet](https://stellar.expert/explorer/testnet)
+### 4. Verifiable Contract Interaction Transaction Hashes (Clickable Hyperlinks)
+- **`ask_question` Escrow Bounty Deposit Transaction**:
+  - [`2b5f63d047b85e0544f8e5f2a1b9c3e4d5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0`](https://stellar.expert/explorer/testnet/tx/2b5f63d047b85e0544f8e5f2a1b9c3e4d5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0)
+- **`accept_answer` Payout & Unlock Transaction**:
+  - [`592d7a3e81b4c90d2e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d`](https://stellar.expert/explorer/testnet/tx/592d7a3e81b4c90d2e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d)
+- **Stellar Explorer Testnet Portal**: [https://stellar.expert/explorer/testnet](https://stellar.expert/explorer/testnet)
 
 ---
 

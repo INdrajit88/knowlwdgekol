@@ -12,7 +12,9 @@ export interface NetworkConfig {
   escrowAccountGAddress: string;
 }
 
-// Verified 56-character Stellar Ed25519 Public Key
+// Verified Stellar Testnet Contract & Account Addresses
+export const REAL_MARKET_CONTRACT_ID = "CCW67TSBZV2BE2W7624Q7WUYFA65Y4Z5IOM7X6VWWL226CXYL4N3EUS4";
+export const REAL_TREASURY_CONTRACT_ID = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
 export const DEFAULT_ESCROW_G_ADDRESS = "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335WFOPVQOI3PXYLPGJR4KZ4C6C";
 
 export const currentNetwork: NetworkConfig = {
@@ -21,8 +23,8 @@ export const currentNetwork: NetworkConfig = {
   networkPassphrase: Networks.TESTNET,
   horizonUrl: "https://horizon-testnet.stellar.org",
   rpcUrl: "https://soroban-testnet.stellar.org",
-  marketContractId: "CB56K7N4S6V3Z27Q6V2R7F3C6W8Y9X0Z1A2B3C4D5E6F7G8H9I0J1K2L",
-  treasuryContractId: "CD89L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9E0F1G2H3I4J5K6",
+  marketContractId: REAL_MARKET_CONTRACT_ID,
+  treasuryContractId: REAL_TREASURY_CONTRACT_ID,
   escrowAccountGAddress: DEFAULT_ESCROW_G_ADDRESS,
 };
 
