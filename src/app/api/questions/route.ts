@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const id = Date.now();
+    const id = body.id || Date.now();
     const newQuestion: QuestionModel = {
       id,
       asker,
@@ -72,7 +72,9 @@ export async function POST(req: Request) {
       createdAt: "Just now",
     };
 
-    globalQuestions = [newQuestion, ...globalQuestions];
+    if (!globalQuestions.some((q) => q.id === id)) {
+      globalQuestions = [newQuestion, ...globalQuestions];
+    }
 
     return NextResponse.json({ success: true, id, questions: globalQuestions });
   } catch (error: any) {

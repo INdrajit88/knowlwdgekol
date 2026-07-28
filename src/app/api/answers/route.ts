@@ -118,7 +118,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const id = Date.now();
+    const id = body.id || Date.now();
     const ipfsCid = `bafybei${Math.random().toString(36).substring(2, 12)}`;
     const newAnswer: AnswerModel = {
       id,
@@ -144,7 +144,9 @@ export async function POST(req: Request) {
     };
 
     const list = globalAnswers[questionId] || [];
-    globalAnswers[questionId] = [newAnswer, ...list];
+    if (!list.some((a) => a.id === id)) {
+      globalAnswers[questionId] = [newAnswer, ...list];
+    }
 
     return NextResponse.json({ success: true, id, answers: globalAnswers });
   } catch (error: any) {

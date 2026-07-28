@@ -171,6 +171,50 @@ const initialDefaultLeaderboard: ContributorLeaderboardItem[] = [
   },
 ];
 
+function mergeQuestions(local: QuestionModel[], server: QuestionModel[]): QuestionModel[] {
+  const map = new Map<number, QuestionModel>();
+  (server || []).forEach((q) => {
+    if (q && q.id) map.set(q.id, q);
+  });
+  (local || []).forEach((q) => {
+    if (q && q.id) {
+      const existing = map.get(q.id);
+      if (!existing) {
+        map.set(q.id, q);
+      } else {
+        map.set(q.id, {
+          ...existing,
+          ...q,
+          answerCount: Math.max(existing.answerCount || 0, q.answerCount || 0),
+          status: q.status === "Resolved" || existing.status === "Resolved" ? "Resolved" : (q.status === "Answered" || existing.status === "Answered" ? "Answered" : "Open"),
+        });
+      }
+    }
+  });
+  return Array.from(map.values()).sort((a, b) => b.id - a.id);
+}
+
+function mergeAnswers(local: Record<number, AnswerModel[]>, server: Record<number, AnswerModel[]>): Record<number, AnswerModel[]> {
+  const result: Record<number, AnswerModel[]> = { ...(server || {}) };
+  Object.keys(local || {}).forEach((qIdStr) => {
+    const qId = Number(qIdStr);
+    const localList = local[qId] || [];
+    const serverList = result[qId] || [];
+    const map = new Map<number, AnswerModel>();
+    serverList.forEach((a) => map.set(a.id, a));
+    localList.forEach((a) => {
+      const existing = map.get(a.id);
+      if (!existing) {
+        map.set(a.id, a);
+      } else {
+        map.set(a.id, { ...existing, ...a });
+      }
+    });
+    result[qId] = Array.from(map.values()).sort((a, b) => b.id - a.id);
+  });
+  return result;
+}
+
 function saveState(questions: QuestionModel[], answers: Record<number, AnswerModel[]>, leaderboard: ContributorLeaderboardItem[]) {
   if (typeof window !== "undefined") {
     try {
@@ -179,10 +223,37 @@ function saveState(questions: QuestionModel[], answers: Record<number, AnswerMod
   }
 }
 
+function loadInitialState() {
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.questions && Array.isArray(parsed.questions)) {
+          const mergedQ = mergeQuestions(parsed.questions, initialDefaultQuestions);
+          const mergedA = mergeAnswers(parsed.answers || {}, initialDefaultAnswers);
+          return {
+            questions: mergedQ,
+            answers: mergedA,
+            leaderboard: parsed.leaderboard || initialDefaultLeaderboard,
+          };
+        }
+      }
+    } catch (e) {}
+  }
+  return {
+    questions: initialDefaultQuestions,
+    answers: initialDefaultAnswers,
+    leaderboard: initialDefaultLeaderboard,
+  };
+}
+
+const initialState = loadInitialState();
+
 export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
-  questions: initialDefaultQuestions,
-  answers: initialDefaultAnswers,
-  leaderboard: initialDefaultLeaderboard,
+  questions: initialState.questions,
+  answers: initialState.answers,
+  leaderboard: initialState.leaderboard,
 
   syncWithServer: async () => {
     try {
@@ -194,48 +265,57 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
         const qData = await qRes.json();
         const aData = await aRes.json();
         if (qData.questions && aData.answers) {
-          set({ questions: qData.questions, answers: aData.answers });
-          saveState(qData.questions, aData.answers, get().leaderboard);
+          const currentQuestions = get().questions;
+          const currentAnswers = get().answers;
+          const mergedQ = mergeQuestions(currentQuestions, qData.questions);
+          const mergedA = mergeAnswers(currentAnswers, aData.answers);
+          set({ questions: mergedQ, answers: mergedA });
+          saveState(mergedQ, mergedA, get().leaderboard);
         }
       }
     } catch (err) {}
   },
 
   askQuestion: async (prompt, category, bountyXlm, asker) => {
-    let id = Date.now();
+    const id = Date.now();
 
     // Deduct bounty XLM from asking user's balance
     useWalletStore.getState().deductBalance(bountyXlm);
+
+    const newQuestion: QuestionModel = {
+      id,
+      asker,
+      prompt,
+      category,
+      bountyXlm,
+      status: "Open",
+      answerCount: 0,
+      createdAt: "Just now",
+    };
+
+    set((state) => {
+      const updated = mergeQuestions([newQuestion], state.questions);
+      saveState(updated, state.answers, state.leaderboard);
+      return { questions: updated };
+    });
 
     try {
       const res = await fetch("/api/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, category, bountyXlm, asker }),
+        body: JSON.stringify({ id, prompt, category, bountyXlm, asker }),
       });
       if (res.ok) {
         const data = await res.json();
-        id = data.id || id;
-        set({ questions: data.questions });
-        saveState(data.questions, get().answers, get().leaderboard);
+        if (data.questions) {
+          set((state) => {
+            const merged = mergeQuestions(state.questions, data.questions);
+            saveState(merged, state.answers, state.leaderboard);
+            return { questions: merged };
+          });
+        }
       }
-    } catch (e) {
-      const newQuestion: QuestionModel = {
-        id,
-        asker,
-        prompt,
-        category,
-        bountyXlm,
-        status: "Open",
-        answerCount: 0,
-        createdAt: "Just now",
-      };
-      set((state) => {
-        const updated = [newQuestion, ...state.questions];
-        saveState(updated, state.answers, state.leaderboard);
-        return { questions: updated };
-      });
-    }
+    } catch (e) {}
 
     eventStreamService.emitEvent({
       id: `evt-${id}`,
@@ -256,56 +336,49 @@ export const useKnowledgeStore = create<KnowledgeState>((set, get) => ({
   },
 
   submitAnswer: async (questionId, author, teaser, fullArticle) => {
-    let id = Date.now();
+    const id = Date.now();
+    const newAnswer: AnswerModel = {
+      id,
+      questionId,
+      author,
+      authorTier: "Silver",
+      teaser,
+      fullArticle,
+      isUnlocked: false,
+      upvotes: 1,
+      isAccepted: false,
+      ipfsCid: `bafybei${Math.random().toString(36).substring(2, 12)}`,
+      createdAt: "Just now",
+      citations: [],
+    };
+
+    set((state) => {
+      const existingAnswers = state.answers[questionId] || [];
+      const updatedAnswers = { ...state.answers, [questionId]: [newAnswer, ...existingAnswers.filter((a) => a.id !== id)] };
+      const updatedQuestions = state.questions.map((q) =>
+        q.id === questionId ? { ...q, answerCount: q.answerCount + 1, status: (q.status === "Open" ? "Answered" : q.status) as any } : q
+      );
+      saveState(updatedQuestions, updatedAnswers, state.leaderboard);
+      return { answers: updatedAnswers, questions: updatedQuestions };
+    });
+
     try {
       const res = await fetch("/api/answers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId, author, teaser, fullArticle }),
+        body: JSON.stringify({ id, questionId, author, teaser, fullArticle }),
       });
       if (res.ok) {
         const data = await res.json();
-        id = data.id || id;
-        set((state) => {
-          const updatedQuestions = state.questions.map((q) => {
-            if (q.id === questionId) {
-              return {
-                ...q,
-                answerCount: q.answerCount + 1,
-                status: (q.status === "Open" ? "Answered" : q.status) as any,
-              };
-            }
-            return q;
+        if (data.answers) {
+          set((state) => {
+            const mergedA = mergeAnswers(state.answers, data.answers);
+            saveState(state.questions, mergedA, state.leaderboard);
+            return { answers: mergedA };
           });
-          saveState(updatedQuestions, data.answers, state.leaderboard);
-          return { answers: data.answers, questions: updatedQuestions };
-        });
+        }
       }
-    } catch (e) {
-      const newAnswer: AnswerModel = {
-        id,
-        questionId,
-        author,
-        authorTier: "Silver",
-        teaser,
-        fullArticle,
-        isUnlocked: false,
-        upvotes: 1,
-        isAccepted: false,
-        ipfsCid: `bafybei${Math.random().toString(36).substring(2, 12)}`,
-        createdAt: "Just now",
-        citations: [],
-      };
-      set((state) => {
-        const existingAnswers = state.answers[questionId] || [];
-        const updatedAnswers = { ...state.answers, [questionId]: [newAnswer, ...existingAnswers] };
-        const updatedQuestions = state.questions.map((q) =>
-          q.id === questionId ? { ...q, answerCount: q.answerCount + 1, status: (q.status === "Open" ? "Answered" : q.status) as any } : q
-        );
-        saveState(updatedQuestions, updatedAnswers, state.leaderboard);
-        return { answers: updatedAnswers, questions: updatedQuestions };
-      });
-    }
+    } catch (e) {}
 
     eventStreamService.emitEvent({
       id: `evt-${id}`,
