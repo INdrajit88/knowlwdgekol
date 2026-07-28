@@ -18,11 +18,21 @@
 
 ---
 
-## 📸 Application Screenshots
+## 📸 Application Web & Mobile Screenshots
+
+### 💻 Desktop Web UI
 
 | Main Experience Marketplace Dashboard | Landing Homepage |
 |:---:|:---:|
 | ![knowledgekol Dashboard](image.png) | ![knowledgekol Homepage](image-1.png) |
+
+---
+
+### 📱 Mobile Responsive UI & Navigation
+
+| Mobile Navigation Drawer | Mobile Marketplace View | Mobile Detail & Answer View |
+|:---:|:---:|:---:|
+| ![Mobile Navigation Drawer](image-2.png) | ![Mobile Marketplace View](image-3.png) | ![Mobile Detail & Answer View](image-4.png) |
 
 > **Mobile Responsive UI** — Built with Tailwind CSS responsive breakpoints featuring a mobile-first navigation drawer, fluid grid layouts, and touch-optimized interactive elements across all screen sizes.
 
@@ -88,7 +98,7 @@ This repository contains **42+ commits**. View full history: [github.com/INdraji
 | **Event Streaming & Real-Time Updates** | ✅ | Soroban `env.events().publish()` on all state transitions (`question_created`, `answer_submitted`, `question_resolved`, `escrow_deposited`, `escrow_released`, `reputation_updated`) + Next.js `/api/questions` & `/api/answers` with `BroadcastChannel` cross-tab sync |
 | **CI/CD Pipeline Setup** | ✅ | 3 GitHub Actions workflows: `ci.yml` (main CI), `pr.yml` (PR gate with cargo cache), `deploy.yml` (production CD). All run Rust contract tests + TypeScript typecheck + Vitest suite automatically |
 | **Smart Contract Deployment Workflow** | ✅ | `scripts/deploy.sh` automates: `stellar contract build` → WASM deploy → inter-contract `initialize` → save to `contracts.json` + `.env.local`. Used to produce all 7 real transactions above |
-| **Mobile Responsive Frontend** | ✅ | Next.js 15 App Router + Tailwind CSS — mobile-first drawer nav, `grid-cols-1 md:grid-cols-3` layouts, touch-optimized wallet connect, SSR-safe 2-phase hydration |
+| **Mobile Responsive Frontend** | ✅ | Next.js 15 App Router + Tailwind CSS — mobile-first drawer nav, `grid-cols-1 md:grid-cols-3` layouts, touch-optimized wallet connect, SSR-safe 2-phase hydration. See [📱 Mobile Screenshots Gallery](#-mobile-responsive-ui--navigation) (`image-2.png`, `image-3.png`, `image-4.png`) |
 | **Error Handling & Loading States** | ✅ | `MarketError` enum in Rust, Zustand optimistic updates with rollback, transaction lifecycle toasts (`Pending → Confirmed / Failed`), Freighter not-installed banner with install link |
 | **Writing Tests (Contracts & Frontend)** | ✅ | **2 Soroban Rust unit/inter-contract tests** + **9 Vitest tests** (3 files) = **11 total passing tests** |
 | **Production-Ready Architecture** | ✅ | Clean layered architecture: Soroban contracts → `stellar.ts` service → Zustand stores → Next.js API routes → React components. Zero hydration warnings |
