@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { isConnected, publicKey, xlmBalance, isConnecting, connectWallet, disconnectWallet, network, error, clearError } =
+  const { isConnected, publicKey, xlmBalance, isConnecting, connectWallet, connectDemoWallet, disconnectWallet, network, error, clearError } =
     useWalletStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -30,7 +30,13 @@ export function Navbar() {
             <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="font-medium">{error}</span>
           </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => connectDemoWallet()}
+              className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition-all"
+            >
+              <span>Use Testnet Demo Wallet</span>
+            </button>
             <a
               href="https://www.freighter.app"
               target="_blank"

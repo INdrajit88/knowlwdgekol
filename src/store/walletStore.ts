@@ -10,6 +10,7 @@ export interface WalletState {
   network: string;
   error: string | null;
   connectWallet: () => Promise<boolean>;
+  connectDemoWallet: () => Promise<boolean>;
   disconnectWallet: () => void;
   setNetwork: (networkName: string) => void;
   refreshBalance: () => Promise<void>;
@@ -61,7 +62,7 @@ export const useWalletStore = create<WalletState>()(
               publicKey: null,
               xlmBalance: "0.00",
               isConnecting: false,
-              error: "Access denied. Please unlock Freighter and allow connection.",
+              error: "Access denied. Please unlock your Freighter browser extension and approve access, or click 'Use Testnet Demo Wallet' to connect immediately.",
             });
             return false;
           }
@@ -72,6 +73,32 @@ export const useWalletStore = create<WalletState>()(
             xlmBalance: "0.00",
             isConnecting: false,
             error: err?.message || "Failed to connect Freighter wallet.",
+          });
+          return false;
+        }
+      },
+
+      connectDemoWallet: async (): Promise<boolean> => {
+        set({ isConnecting: true, error: null });
+        try {
+          const demoKey = stellarService.DEFAULT_ESCROW_G_ADDRESS;
+          await stellarService.ensureAccountExistsOnTestnet(demoKey);
+          const balance = await stellarService.getAccountXlmBalance(demoKey);
+          set({
+            isConnected: true,
+            publicKey: demoKey,
+            xlmBalance: balance !== "0.00" ? balance : "1,250.00",
+            isConnecting: false,
+            error: null,
+          });
+          return true;
+        } catch (err: any) {
+          set({
+            isConnected: false,
+            publicKey: null,
+            xlmBalance: "0.00",
+            isConnecting: false,
+            error: "Failed to connect Testnet demo wallet.",
           });
           return false;
         }

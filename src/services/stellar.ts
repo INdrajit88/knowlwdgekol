@@ -58,10 +58,26 @@ export async function checkFreighterInstalled(): Promise<boolean> {
 export async function getFreighterPublicKey(): Promise<string | null> {
   try {
     const mod = freighterApi as any;
-    const fn = mod.getPublicKey || mod.default?.getPublicKey;
-    if (typeof fn === "function") {
-      const key = await fn();
-      return key && isValidStellarAddress(key) ? key : null;
+    // 1. Try requestAccess (triggers user prompt modal in Freighter extension)
+    const reqFn = mod.requestAccess || mod.default?.requestAccess;
+    if (typeof reqFn === "function") {
+      try {
+        const key = await reqFn();
+        if (key && isValidStellarAddress(key)) {
+          return key;
+        }
+      } catch (reqErr) {
+        console.warn("requestAccess failed/cancelled:", reqErr);
+      }
+    }
+
+    // 2. Fall back to getPublicKey
+    const getFn = mod.getPublicKey || mod.default?.getPublicKey;
+    if (typeof getFn === "function") {
+      const key = await getFn();
+      if (key && isValidStellarAddress(key)) {
+        return key;
+      }
     }
   } catch (err) {}
   return null;
