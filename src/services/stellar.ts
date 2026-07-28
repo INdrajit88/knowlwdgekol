@@ -43,43 +43,115 @@ export function isValidStellarAddress(address: string | undefined): boolean {
   }
 }
 
+function parseAddress(res: any): string | null {
+  if (!res) return null;
+  if (typeof res === "string" && isValidStellarAddress(res)) {
+    return res;
+  }
+  if (typeof res === "object") {
+    if (res.address && typeof res.address === "string" && isValidStellarAddress(res.address)) {
+      return res.address;
+    }
+    if (res.publicKey && typeof res.publicKey === "string" && isValidStellarAddress(res.publicKey)) {
+      return res.publicKey;
+    }
+  }
+  return null;
+}
+
+function parseSignedXdr(res: any): string | null {
+  if (!res) return null;
+  if (typeof res === "string" && res.length > 0) {
+    return res;
+  }
+  if (typeof res === "object") {
+    if (res.signedTxXdr && typeof res.signedTxXdr === "string") {
+      return res.signedTxXdr;
+    }
+    if (res.xdr && typeof res.xdr === "string") {
+      return res.xdr;
+    }
+  }
+  return null;
+}
+
 export async function checkFreighterInstalled(): Promise<boolean> {
   try {
     const mod = freighterApi as any;
     const fn = mod.isConnected || mod.default?.isConnected;
     if (typeof fn === "function") {
-      const connected = await fn();
-      return !!connected;
+      const res = await fn();
+      if (typeof res === "boolean") return res;
+      if (typeof res === "object" && typeof res.isConnected === "boolean") return res.isConnected;
     }
   } catch (err) {}
+  if (typeof window !== "undefined") {
+    const win = window as any;
+    if (win.freighter || win.freighterApi || win.stellar) return true;
+  }
   return typeof window !== "undefined";
 }
 
 export async function getFreighterPublicKey(): Promise<string | null> {
   try {
     const mod = freighterApi as any;
-    // 1. Try requestAccess (triggers user prompt modal in Freighter extension)
+
+    // 1. Try requestAccess (Freighter v6 primary permission prompt)
     const reqFn = mod.requestAccess || mod.default?.requestAccess;
     if (typeof reqFn === "function") {
       try {
-        const key = await reqFn();
-        if (key && isValidStellarAddress(key)) {
-          return key;
-        }
+        const res = await reqFn();
+        const addr = parseAddress(res);
+        if (addr) return addr;
       } catch (reqErr) {
-        console.warn("requestAccess failed/cancelled:", reqErr);
+        console.warn("requestAccess failed:", reqErr);
       }
     }
 
-    // 2. Fall back to getPublicKey
-    const getFn = mod.getPublicKey || mod.default?.getPublicKey;
-    if (typeof getFn === "function") {
-      const key = await getFn();
-      if (key && isValidStellarAddress(key)) {
-        return key;
+    // 2. Try getAddress (Freighter v6 address fetch)
+    const getAddrFn = mod.getAddress || mod.default?.getAddress;
+    if (typeof getAddrFn === "function") {
+      try {
+        const res = await getAddrFn();
+        const addr = parseAddress(res);
+        if (addr) return addr;
+      } catch (getErr) {
+        console.warn("getAddress failed:", getErr);
       }
     }
-  } catch (err) {}
+
+    // 3. Try getPublicKey (legacy fallback)
+    const getPkFn = mod.getPublicKey || mod.default?.getPublicKey;
+    if (typeof getPkFn === "function") {
+      try {
+        const res = await getPkFn();
+        const addr = parseAddress(res);
+        if (addr) return addr;
+      } catch (pkErr) {}
+    }
+
+    // 4. Try window object directly if injected by extension
+    if (typeof window !== "undefined") {
+      const win = window as any;
+      const f = win.freighterApi || win.freighter;
+      if (f) {
+        if (typeof f.requestAccess === "function") {
+          const addr = parseAddress(await f.requestAccess());
+          if (addr) return addr;
+        }
+        if (typeof f.getAddress === "function") {
+          const addr = parseAddress(await f.getAddress());
+          if (addr) return addr;
+        }
+        if (typeof f.getPublicKey === "function") {
+          const addr = parseAddress(await f.getPublicKey());
+          if (addr) return addr;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("getFreighterPublicKey error:", err);
+  }
   return null;
 }
 
@@ -190,18 +262,20 @@ export async function invokeSorobanTestnetTransaction(
       const mod = freighterApi as any;
       const signFn = mod.signTransaction || mod.default?.signTransaction;
       if (typeof signFn === "function") {
-        const signedXdr = await signFn(tx.toXDR(), {
+        const res = await signFn(tx.toXDR(), {
           network: "TESTNET",
           networkPassphrase: currentNetwork.networkPassphrase,
         });
 
-        if (signedXdr) {
+        const rawSignedXdr = parseSignedXdr(res);
+
+        if (rawSignedXdr) {
           try {
-            const res = await horizonServer.submitTransaction(
-              TransactionBuilder.fromXDR(signedXdr, currentNetwork.networkPassphrase)
+            const submitRes = await horizonServer.submitTransaction(
+              TransactionBuilder.fromXDR(rawSignedXdr, currentNetwork.networkPassphrase)
             );
-            if (res && res.hash) {
-              return res.hash;
+            if (submitRes && submitRes.hash) {
+              return submitRes.hash;
             }
           } catch (subErr) {}
         }
