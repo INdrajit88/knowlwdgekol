@@ -8,7 +8,7 @@ describe("Production Transaction Management Store", () => {
     const txId = store.addTransaction({
       txHash: "",
       operationName: "ask_question",
-      contractInvolved: "CCK54V3Z27Q6V2R7F3C6W8Y9X0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O",
+      contractInvolved: "CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP",
       status: "Pending",
       timestamp: "Just now",
     });
@@ -24,7 +24,7 @@ describe("Production Transaction Management Store", () => {
     const txId = store.addTransaction({
       txHash: "",
       operationName: "accept_answer",
-      contractInvolved: "CBX12A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z",
+      contractInvolved: "CCCFGPBJOHDGK6OQ54I4JZH5ZYA4FSSUMITRMOOGZMZYTT42A44YQ6AU",
       status: "Pending",
       timestamp: "Just now",
     });
