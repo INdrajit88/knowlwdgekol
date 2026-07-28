@@ -12,7 +12,7 @@
 
 **A production-grade, decentralized Peer-to-Peer Technical Experience & Knowledge Sharing Marketplace built on the Stellar Soroban smart contract engine.**
 
-[🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP) · [🐛 Report Bug](https://github.com/INdrajit88/knowlwdgekol/issues)
+[🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📹 Demo Video](https://youtu.be/OG45w5ZYOQY) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP) · [🐛 Report Bug](https://github.com/INdrajit88/knowlwdgekol/issues)
 
 </div>
 
@@ -74,7 +74,8 @@ All transactions below are **real, on-chain interactions** executed against the 
 This repository contains **42+ commits**. View full history: [github.com/INdrajit88/knowlwdgekol/commits](https://github.com/INdrajit88/knowlwdgekol/commits)
 
 ### ✅ Demo Video
-📹 **Demo Video (1–2 min):** *(Upload a Loom or YouTube walkthrough showing: wallet connect → ask question → submit answer → accept answer → escrow release → full article unlock)*
+📹 **YouTube Demo Video:** **[https://youtu.be/OG45w5ZYOQY](https://youtu.be/OG45w5ZYOQY)**
+- Walkthrough demonstrating: Freighter wallet connection → posting experience request → escrow bounty deposit → submitting teaser & locked solution → accepting answer → automated escrow payout & full article unlock.
 
 ---
 
