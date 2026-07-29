@@ -26,12 +26,12 @@ This repository fulfills **100% of all required submission criteria** for the St
 |---|---|:---:|---|
 | 1 | **Public GitHub Repository** | ✅ | **[github.com/INdrajit88/knowlwdgekol](https://github.com/INdrajit88/knowlwdgekol)** |
 | 2 | **README with Complete Documentation** | ✅ | Full architecture diagrams, setup guides, contract schemas, test suite evidence, and deployment procedures (below) |
-| 3 | **Minimum 15+ Meaningful Commits** | ✅ | **45+ semantic commits** in repository history ([View Git Commit History](https://github.com/INdrajit88/knowlwdgekol/commits)) |
+| 3 | **Minimum 15+ Meaningful Commits** | ✅ | **46+ semantic commits** in repository history ([View Git Commit History](https://github.com/INdrajit88/knowlwdgekol/commits)) |
 | 4 | **Live Demo Link** | ✅ | **[https://knowlwdgekol.vercel.app](https://knowlwdgekol.vercel.app)** — Deployed on Vercel with automatic CI/CD |
 | 5 | **Contract Deployment Address** | ✅ | Deployed on Stellar Testnet: Marketplace [`CAKCIXGBEJ...`](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP), Treasury [`CCCFGPBJ...`](https://stellar.expert/explorer/testnet/contract/CCCFGPBJOHDGK6OQ54I4JZH5ZYA4FSSUMITRMOOGZMZYTT42A44YQ6AU) |
 | 6 | **Product UI Screenshots** | ✅ | Desktop Web UI Gallery (`image.png`, `image-1.png`) |
 | 7 | **Mobile Responsive Screenshots** | ✅ | Mobile Navigation & View Gallery (`image-2.png`, `image-3.png`, `image-4.png`) |
-| 8 | **Analytics or Monitoring Setup Screenshots** | ✅ | Protocol Monitoring & Leaderboard UI Gallery (`image-5.png`) |
+| 8 | **Analytics or Monitoring Setup** | ✅ | Integrated Contributor Analytics & On-Chain Reputation Telemetry Dashboard (`/analytics`) |
 | 9 | **Demo Video Link** | ✅ | **[https://youtu.be/OG45w5ZYOQY](https://youtu.be/OG45w5ZYOQY)** — YouTube Walkthrough of full wallet interaction lifecycle |
 | 10 | **Proof of 10+ User Wallet Interactions** | ✅ | **12 Verified On-Chain Transactions** with direct Stellar Expert links (see [Proof of 10+ User Wallet Interactions](#-proof-of-10-user-wallet-interactions)) |
 | 11 | **Basic User Feedback Summary** | ✅ | Comprehensive beta testing summary & metrics (see [Basic User Feedback Summary](#-basic-user-feedback-summary)) |
@@ -55,16 +55,6 @@ This repository fulfills **100% of all required submission criteria** for the St
 | ![Mobile Navigation Drawer](image-2.png) | ![Mobile Marketplace View](image-3.png) | ![Mobile Detail & Answer View](image-4.png) |
 
 > **Mobile Responsive Design** — Built using Tailwind CSS mobile-first responsive breakpoints featuring dynamic slide-out navigation drawers, responsive grid cards (`grid-cols-1 md:grid-cols-3`), and touch-optimized action buttons for seamless operation across mobile devices, tablets, and desktops.
-
----
-
-### 📊 Analytics & Protocol Monitoring Setup
-
-| Protocol Monitoring & Contributor Analytics Dashboard |
-|:---:|
-| ![Analytics & Monitoring Setup](image-5.png) |
-
-> **Analytics & Protocol Monitoring Setup** — Real-time performance telemetry dashboard capturing Stellar RPC node health, average transaction latency, active user wallet sessions, daily XLM escrow volume, and on-chain contract logs.
 
 ---
 
