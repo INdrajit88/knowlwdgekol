@@ -12,7 +12,7 @@
 
 **A production-grade, decentralized Peer-to-Peer Technical Experience & Knowledge Sharing Marketplace built on the Stellar Soroban smart contract engine.**
 
-[🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📹 Demo Video](https://youtu.be/OG45w5ZYOQY) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP) · [🐛 Report Bug](https://github.com/INdrajit88/knowlwdgekol/issues)
+[🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📹 Demo Video](https://youtu.be/OG45w5ZYOQY) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP) · [📋 Feedback Form](https://forms.gle/SnWiwTnhhHKJmxZr9) · [📊 Feedback Spreadsheet](https://docs.google.com/spreadsheets/d/1Ao_51ebIyM8RQbqsURzp9d0H4qyVf2k-0QcrD5dZ0Nw/edit?usp=sharing) · [🐛 Report Bug](https://github.com/INdrajit88/knowlwdgekol/issues)
 
 </div>
 
@@ -34,7 +34,7 @@ This repository fulfills **100% of all required submission criteria** for the St
 | 8 | **Analytics or Monitoring Setup** | ✅ | Integrated Contributor Analytics & On-Chain Reputation Telemetry Dashboard (`/analytics`) |
 | 9 | **Demo Video Link** | ✅ | **[https://youtu.be/OG45w5ZYOQY](https://youtu.be/OG45w5ZYOQY)** — YouTube Walkthrough of full wallet interaction lifecycle |
 | 10 | **Proof of 10+ User Wallet Interactions** | ✅ | **12 Verified On-Chain Transactions** with direct Stellar Expert links (see [Proof of 10+ User Wallet Interactions](#-proof-of-10-user-wallet-interactions)) |
-| 11 | **Basic User Feedback Summary** | ✅ | Comprehensive beta testing summary & metrics (see [Basic User Feedback Summary](#-basic-user-feedback-summary)) |
+| 11 | **Basic User Feedback Summary** | ✅ | Comprehensive beta testing summary, [Feedback Form](https://forms.gle/SnWiwTnhhHKJmxZr9) & [Feedback Spreadsheet](https://docs.google.com/spreadsheets/d/1Ao_51ebIyM8RQbqsURzp9d0H4qyVf2k-0QcrD5dZ0Nw/edit?usp=sharing) (see [Basic User Feedback Summary](#-basic-user-feedback-summary)) |
 
 ---
 
@@ -81,7 +81,10 @@ All 12 transactions below represent **verified on-chain operations** executed on
 
 ## 💬 Basic User Feedback Summary
 
-During our closed beta testnet trial, **14 active Stellar community users and developers** tested the knowledgekol platform. Below is the quantitative feedback summary and key user insights collected:
+During our closed beta testnet trial, **14 active Stellar community users and developers** tested the knowledgekol platform. Below is the quantitative feedback summary, direct links to community feedback resources, and key user insights collected:
+
+> 📋 **User Feedback Form**: [Submit Feedback on Google Forms](https://forms.gle/SnWiwTnhhHKJmxZr9)  
+> 📊 **User Feedback Spreadsheet**: [View Feedback Spreadsheet](https://docs.google.com/spreadsheets/d/1Ao_51ebIyM8RQbqsURzp9d0H4qyVf2k-0QcrD5dZ0Nw/edit?usp=sharing)
 
 ### Quantitative Beta Metrics
 
@@ -281,6 +284,6 @@ Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for full detai
 
 **Built with ❤️ on Stellar Soroban**
 
-[⭐ Star on GitHub](https://github.com/INdrajit88/knowlwdgekol) · [🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP)
+[⭐ Star on GitHub](https://github.com/INdrajit88/knowlwdgekol) · [🚀 Live Demo](https://knowlwdgekol.vercel.app) · [📋 Feedback Form](https://forms.gle/SnWiwTnhhHKJmxZr9) · [📊 Feedback Spreadsheet](https://docs.google.com/spreadsheets/d/1Ao_51ebIyM8RQbqsURzp9d0H4qyVf2k-0QcrD5dZ0Nw/edit?usp=sharing) · [📄 Contract Explorer](https://stellar.expert/explorer/testnet/contract/CAKCIXGBEJTTQEVOVM3TPPQIP5WWUJEHUMOW2X322C4KZYBTBGSIAGHP)
 
 </div>
